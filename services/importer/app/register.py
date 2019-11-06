@@ -5,7 +5,7 @@ from datetime import datetime
 from confluent_kafka.cimpl import Consumer
 from redis import Redis
 
-from app.configuration import ConfigDefinition
+from app.configuration import REDIS_PREFIX
 from app.utils import hash_product
 
 
@@ -15,11 +15,8 @@ class Register:
     def __init__(
             self,
             consumer: Consumer,
-            redis_cli: Redis,
-            config: ConfigDefinition
+            redis_cli: Redis
     ) -> None:
-        self.config = config
-        consumer.subscribe([config.KAFKA_TOPIC])
         self.consumer = consumer
         self.redis = redis_cli
 
@@ -38,7 +35,7 @@ class Register:
             digest = hash_product(raw)
             date = str(datetime.now())
 
-            self.redis.set(self.config.REDIS_PREFIX + digest, date)
+            self.redis.set(REDIS_PREFIX + digest, date)
 
             product = json.loads(raw.decode('utf-8'))
 

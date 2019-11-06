@@ -10,17 +10,22 @@ from confluent_kafka.cimpl import (Consumer, KafkaError, KafkaException,
                                    Producer)
 from redis import Redis
 
-from app.configuration import CONFIG
+from app.configuration import CONFIG, KAFKA_TOPIC, REDIS_PREFIX
 from app.importer import Importer
 from app.register import Register
+from app.systembolaget import Systembolaget
 
 
 def _main() -> None:
     redis_client = _get_redis()
 
     services = [
-        Importer(_get_producer(), redis_client, CONFIG),
-        Register(_get_consumer(), redis_client, CONFIG)
+        Importer(
+            _get_producer(),
+            redis_client,
+            Systembolaget(CONFIG.SYSTEMBOLAGET_API_KEY)
+        ),
+        Register(_get_consumer(), redis_client)
     ]
     threads = []
 
@@ -32,11 +37,14 @@ def _main() -> None:
 
 
 def _get_consumer() -> Consumer:
-    return Consumer({
+    consumer = Consumer({
         'bootstrap.servers': CONFIG.KAFKA_HOST,
         'group.id': CONFIG.KAFKA_GROUP_ID,
         'auto.offset.reset': 'earliest'
     })
+    consumer.subscribe([KAFKA_TOPIC])
+
+    return consumer
 
 
 def _get_producer() -> Producer:
@@ -52,7 +60,7 @@ def _get_redis() -> Redis:
 
 def _debug() -> None:
     redis_client = _get_redis()
-    keys = redis_client.keys(CONFIG.REDIS_PREFIX + '*')
+    keys = redis_client.keys(REDIS_PREFIX + '*')
     print('Number of cached products in Redis: {}'.format(len(keys)))
     topics = _get_consumer().list_topics().topics
     topics = filter(lambda topic: '__' not in topic, [*topics])
@@ -64,11 +72,11 @@ def _debug() -> None:
 def _reset() -> None:
     print('Clearing Kafka and Redis')
     redis_client = _get_redis()
-    keys = redis_client.keys(CONFIG.REDIS_PREFIX + '*')
+    keys = redis_client.keys(REDIS_PREFIX + '*')
     if len(keys) > 0:
         redis_client.delete(*keys)
     admin = AdminClient({'bootstrap.servers': CONFIG.KAFKA_HOST})
-    topics = admin.delete_topics([CONFIG.KAFKA_TOPIC], operation_timeout=30)
+    topics = admin.delete_topics([KAFKA_TOPIC], operation_timeout=30)
     for topic, future in topics.items():
         try:
             future.result()  # The result itself is None

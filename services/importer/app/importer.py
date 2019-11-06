@@ -1,17 +1,15 @@
 """Provides the Importer class."""
-import json
 import sys
 import time
 from datetime import datetime
-from http.client import HTTPException
-from typing import List, Optional
+from typing import Optional
 
-import requests
 import schedule
 from confluent_kafka.cimpl import KafkaError, Message, Producer
 from redis import Redis
 
-from app.configuration import ConfigDefinition
+from app.configuration import KAFKA_TOPIC, REDIS_PREFIX
+from app.systembolaget import Systembolaget
 from app.utils import hash_product
 
 
@@ -26,7 +24,7 @@ def _delivery_report(
     """
     if err is not None:
         print('[{}] Message delivery failed: {}'.
-              format(str(datetime.now()), err))
+              format(str(datetime.now()), err), file=sys.stderr)
     elif msg is Message:
         print('[{}] Message delivered to {} [{}]'.
               format(str(datetime.now()), msg.topic(), msg.partition()))
@@ -39,41 +37,20 @@ class Importer:
             self,
             producer: Producer,
             redis_cli: Redis,
-            config: ConfigDefinition
+            systembolaget: Systembolaget
     ) -> None:
         self.producer = producer
         self.redis = redis_cli
-        self.config = config
-
-    def _get_data(self) -> List[str]:
-        headers = {
-            'Ocp-Apim-Subscription-Key': self.config.SYSTEMBOLAGET_API_KEY,
-        }
-
-        data: List[str] = []
-
-        try:
-            response = requests.get(
-                self.config.SYSTEMBOLAGET_API_HOST +
-                self.config.SYSTEMBOLAGET_API_PRODUCTS_URL,
-                headers=headers
-            )
-            data = json.loads(response.content.decode('utf-8'))
-            response.close()
-        except HTTPException as err:
-            print(err, file=sys.stderr)
-
-        return data
+        self.systembolaget = systembolaget
 
     def _import(self) -> None:
-        data = self._get_data()
+        data = self.systembolaget.get_products()
         imported = 0
 
         for product in data:
-            raw = json.dumps(product).encode('utf-8')
-            digest = hash_product(raw)
+            digest = hash_product(product)
 
-            if self.redis.exists(self.config.REDIS_PREFIX + digest) == 1:
+            if self.redis.exists(REDIS_PREFIX + digest) == 1:
                 continue
 
             # Asynchronously produce a message, the delivery report callback
@@ -81,8 +58,8 @@ class Importer:
             # when the message has been successfully delivered or failed
             # permanently.
             self.producer.produce(
-                self.config.KAFKA_TOPIC,
-                raw,
+                KAFKA_TOPIC,
+                product,
                 callback=_delivery_report
             )
             self.producer.poll(0)
