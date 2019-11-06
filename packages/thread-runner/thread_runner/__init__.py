@@ -14,7 +14,7 @@ class ThreadRunner:
     def __init__(self, services: typing.List[Runnable]) -> None:
         self.services = services
 
-    def run(self):
+    def run(self) -> None:
         """Run services in threads."""
         threads = []
 
