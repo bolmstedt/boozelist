@@ -9,12 +9,13 @@ services:
     ports:
       - "9092:9092"
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: localhost # Change this to your local IP
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_BROKER_ID: 1
       KAFKA_DELETE_TOPIC_ENABLE: "true"
       KAFKA_LOG_RETENTION_BYTES: -1
       KAFKA_LOG_RETENTION_HOURS: -1
+    env_file:
+      - .env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
