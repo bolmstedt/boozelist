@@ -2,3 +2,4 @@
 .mypy_cache/
 *.egg-info/
 venv/
+docker-compose.override.yml

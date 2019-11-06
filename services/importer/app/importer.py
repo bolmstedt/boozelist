@@ -11,6 +11,7 @@ from redis import Redis
 from app.configuration import KAFKA_TOPIC, REDIS_PREFIX
 from app.systembolaget import Systembolaget
 from app.utils import hash_product
+from thread_runner import Runnable
 
 
 def _delivery_report(
@@ -30,7 +31,7 @@ def _delivery_report(
               format(str(datetime.now()), msg.topic(), msg.partition()))
 
 
-class Importer:
+class Importer(Runnable):
     """Class to import new products from Systembolaget."""
 
     def __init__(

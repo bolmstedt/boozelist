@@ -7,9 +7,10 @@ from redis import Redis
 
 from app.configuration import REDIS_PREFIX
 from app.utils import hash_product
+from thread_runner import Runnable
 
 
-class Register:
+class Register(Runnable):
     """Class to register produced products to Redis."""
 
     def __init__(

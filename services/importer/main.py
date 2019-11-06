@@ -1,6 +1,5 @@
 """Imports products from api.systembolaget.se (and registers them)."""
 import sys
-import threading
 from datetime import datetime
 from pprint import pprint
 
@@ -14,26 +13,19 @@ from app.configuration import CONFIG, KAFKA_TOPIC, REDIS_PREFIX
 from app.importer import Importer
 from app.register import Register
 from app.systembolaget import Systembolaget
+from thread_runner import ThreadRunner
 
 
 def _main() -> None:
     redis_client = _get_redis()
-
-    services = [
+    ThreadRunner([
         Importer(
             _get_producer(),
             redis_client,
             Systembolaget(CONFIG.SYSTEMBOLAGET_API_KEY)
         ),
         Register(_get_consumer(), redis_client)
-    ]
-    threads = []
-
-    for service in services:
-        threads.append(threading.Thread(target=service.run))
-
-    for thread in threads:
-        thread.start()
+    ]).run()
 
 
 def _get_consumer() -> Consumer:

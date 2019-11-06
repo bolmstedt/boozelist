@@ -15,6 +15,7 @@ redis = "*"
 schedule = "*"
 config-loader = {editable = true,path = "./../../packages/config-loader"}
 requests = "*"
+thread-runner = {editable = true,path = "./../../packages/thread-runner"}
 
 [requires]
 python_version = "3.7"
