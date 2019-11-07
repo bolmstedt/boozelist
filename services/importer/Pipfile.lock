@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a31b05eb55f8b29401fda0d30c89d9b68d54d52ed95579d9977c3fba9312eb6e"
+            "sha256": "c4767c529d0b6d0f5576ac03d970ca0da263b1f73a6e63baeae0a22d92fb6b3c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -96,6 +96,10 @@
             ],
             "index": "pypi",
             "version": "==0.6.0"
+        },
+        "simple-server": {
+            "editable": true,
+            "path": "./../../packages/simple-server"
         },
         "thread-runner": {
             "editable": true,

@@ -12,20 +12,35 @@ from redis import Redis
 from app.configuration import CONFIG, KAFKA_TOPIC, REDIS_PREFIX
 from app.importer import Importer
 from app.register import Register
+from app.routes import DebugConfig, DebugRoute
 from app.systembolaget import Systembolaget
+from simple_server import SimpleServer
 from thread_runner import ThreadRunner
 
 
 def _main() -> None:
     redis_client = _get_redis()
-    ThreadRunner([
+    routes = {r'^debug$': DebugRoute(
+        redis_client, _get_admin(), DebugConfig(
+            REDIS_PREFIX, [KAFKA_TOPIC], CONFIG
+        )
+    )}
+
+    services = [
         Importer(
             _get_producer(),
             redis_client,
             Systembolaget(CONFIG.SYSTEMBOLAGET_API_KEY)
         ),
-        Register(_get_consumer(), redis_client)
-    ]).run()
+        Register(_get_consumer(), redis_client),
+        SimpleServer(8000, routes),
+    ]
+
+    ThreadRunner(services).run()
+
+
+def _get_admin() -> AdminClient:
+    return AdminClient({'bootstrap.servers': CONFIG.KAFKA_HOST})
 
 
 def _get_consumer() -> Consumer:
@@ -52,9 +67,10 @@ def _get_redis() -> Redis:
 
 def _debug() -> None:
     redis_client = _get_redis()
+    admin = _get_admin()
     keys = redis_client.keys(REDIS_PREFIX + '*')
     print('Number of cached products in Redis: {}'.format(len(keys)))
-    topics = _get_consumer().list_topics().topics
+    topics = admin.list_topics().topics
     topics = filter(lambda topic: '__' not in topic, [*topics])
     print('Kafka topics: {}'.format(', '.join(topics)))
     pprint(CONFIG)
@@ -67,7 +83,7 @@ def _reset() -> None:
     keys = redis_client.keys(REDIS_PREFIX + '*')
     if len(keys) > 0:
         redis_client.delete(*keys)
-    admin = AdminClient({'bootstrap.servers': CONFIG.KAFKA_HOST})
+    admin = _get_admin()
     topics = admin.delete_topics([KAFKA_TOPIC], operation_timeout=30)
     for topic, future in topics.items():
         try:

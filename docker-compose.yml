@@ -28,6 +28,8 @@ services:
     build:
       context: .
       dockerfile: ./services/importer/Dockerfile
+    ports:
+      - "8000:8000"
     environment:
       - KAFKA_HOST=kafka
       - REDIS_HOST=cache

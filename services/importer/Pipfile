@@ -16,6 +16,7 @@ schedule = "*"
 config-loader = {editable = true,path = "./../../packages/config-loader"}
 requests = "*"
 thread-runner = {editable = true,path = "./../../packages/thread-runner"}
+simple-server = {editable = true,path = "./../../packages/simple-server"}
 
 [requires]
 python_version = "3.7"
