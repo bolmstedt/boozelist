@@ -1,4 +1,5 @@
 """Provides service HTTP routes."""
+import threading
 from dataclasses import dataclass
 from typing import Dict, List
 
@@ -38,6 +39,7 @@ class DebugRoute(Route):
         keys = self.redis_client.keys(self.redis_prefix + '*')
         cached_products = format(len(keys))
         configs = self.config._asdict()
+        threads = [thread.name for thread in threading.enumerate()]
 
         return {
             'status': 'ok',
@@ -45,5 +47,6 @@ class DebugRoute(Route):
                 'cached_products': cached_products,
             },
             'topics': self.topics,
-            'config': configs
+            'config': configs,
+            'threads': threads
         }
