@@ -27,7 +27,9 @@ services:
   importer:
     build:
       context: .
-      dockerfile: ./services/importer/Dockerfile
+      dockerfile: ./services/Dockerfile
+      args:
+        SERVICE_NAME: importer
     ports:
       - "8000:8000"
     environment:
