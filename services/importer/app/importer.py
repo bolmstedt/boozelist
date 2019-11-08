@@ -11,7 +11,7 @@ from redis import Redis
 from app.configuration import KAFKA_TOPIC, REDIS_PREFIX
 from app.systembolaget import Systembolaget
 from app.utils import hash_product
-from thread_runner import Runnable
+from thread_runner import Runnable, Runner
 
 
 def _delivery_report(
@@ -72,7 +72,7 @@ class Importer(Runnable):
         print('[{}] Imported {} new products out of {}'.
               format(str(datetime.now()), imported, len(data)))
 
-    def run(self, runner) -> None:
+    def run(self, runner: Runner) -> None:
         """Import new products to Kafka.
 
         Imports any new products from Systembolaget not already

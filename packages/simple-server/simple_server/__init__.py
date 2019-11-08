@@ -62,7 +62,7 @@ class SimpleServer(thread_runner.Runnable):
         self.port = port
         self.router = _Router(routes)
 
-    def run(self, runner) -> None:
+    def run(self, runner: thread_runner.Runner) -> None:
         """Star the HTTP server."""
         server = _RoutingServer(
             ('', self.port),

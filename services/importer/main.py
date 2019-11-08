@@ -1,5 +1,4 @@
 """Imports products from api.systembolaget.se (and registers them)."""
-import signal
 import sys
 from datetime import datetime
 

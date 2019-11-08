@@ -1,6 +1,5 @@
 """Provides the Register class."""
 import json
-import time
 from datetime import datetime
 
 from confluent_kafka.cimpl import Consumer
@@ -8,7 +7,7 @@ from redis import Redis
 
 from app.configuration import REDIS_PREFIX
 from app.utils import hash_product
-from thread_runner import Runnable
+from thread_runner import Runnable, Runner
 
 
 class Register(Runnable):
@@ -33,9 +32,8 @@ class Register(Runnable):
         print('[{}] {} added with hash {}'.
               format(date, product.get('ProductNameBold'), digest))
 
-    def run(self, runner) -> None:
+    def run(self, runner: Runner) -> None:
         """Register produced products to Redis."""
-
         while runner.run:
             msg = self.consumer.poll(1.0)
 
