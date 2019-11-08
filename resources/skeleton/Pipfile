@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylama = "*"
+mypy = "*"
+pylint = "*"
+isort = "*"
+
+[packages]
+config-loader = {editable = true,path = "./../../packages/config-loader"}
+thread-runner = {editable = true,path = "./../../packages/thread-runner"}
+
+[requires]
+python_version = "3.7"

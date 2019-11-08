@@ -39,6 +39,10 @@ docker-compose up -d --build
 To run a service locally, `cd` into the service's directory run `pipenv shell`, `pipenv install`
 and then `python main.py`.
 
+## Create new service
+
+Simply run `cp -r resources/skeleton services/SERVICE_NAME` to create a minimal service stub.
+
 ## Tips
 
 ### Delete topic
