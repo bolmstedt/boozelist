@@ -1,7 +1,6 @@
 """Provides the Runnable class stub and ThreadRunner class."""
 import signal
 import threading
-import time
 import typing
 
 
@@ -30,18 +29,16 @@ class ThreadRunner:
 
     def __init__(self, services: typing.List[Runnable]) -> None:
         self.services = services
+        self.threads = []
 
     def run(self) -> None:
         """Run services in threads."""
-        threads = []
         runner = Runner()
 
         for service in self.services:
-            threads.append(threading.Thread(
+            threading.Thread(
+                name=type(service).__name__,
                 target=service.run,
                 args=(runner,),
                 daemon=service.DAEMON
-            ))
-
-        for thread in threads:
-            thread.start()
+            ).start()
