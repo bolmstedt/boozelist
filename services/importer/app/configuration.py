@@ -9,12 +9,7 @@ REDIS_PREFIX: str = 'product:imported:'
 
 @dataclass(frozen=True)
 class ConfigDefinition:
-    """Definition of config parameters.
-
-    Should have entries like this:
-    VARIABLE: type
-    OTHER_VAR: type = 'default_value'
-    """
+    """Definition of config parameters."""
 
     systembolaget_api_key: str  # Needs to be defined in ENV
     kafka_host: str = 'localhost:9092'
