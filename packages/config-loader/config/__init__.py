@@ -1,10 +1,11 @@
-"""Loads configuration from ENV, using defaults from a NamedTuple."""
+"""Loads configuration from ENV, using defaults from a datacalass."""
 import dataclasses
 import typing
 import os
 
 
 def load(definition: typing.Type[object]) -> typing.List[typing.Any]:
+    """Import ENV variables and cast them to override default values."""
     if not dataclasses.is_dataclass(definition):
         raise TypeError('{} is not a dataclass'.
                         format(type(definition).__name__))
