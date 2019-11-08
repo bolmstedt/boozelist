@@ -10,11 +10,11 @@ from app.configuration import CONFIG, KAFKA_TOPIC, REDIS_PREFIX
 
 def _main() -> None:
     print('Clearing Kafka and Redis')
-    redis_client = Redis(host=CONFIG.REDIS_HOST)
+    redis_client = Redis(host=CONFIG.redis_host)
     keys = redis_client.keys(REDIS_PREFIX + '*')
     if len(keys) > 0:
         redis_client.delete(*keys)
-    admin = AdminClient({'bootstrap.servers': CONFIG.KAFKA_HOST})
+    admin = AdminClient({'bootstrap.servers': CONFIG.kafka_host})
     topics = admin.delete_topics([KAFKA_TOPIC], operation_timeout=30)
     for topic, future in topics.items():
         try:

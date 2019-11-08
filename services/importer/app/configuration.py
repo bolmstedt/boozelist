@@ -1,5 +1,5 @@
 """Contains configuration for this application."""
-from typing import NamedTuple
+from dataclasses import dataclass
 
 import config
 
@@ -7,7 +7,8 @@ KAFKA_TOPIC: str = 'streaming.products.raw'
 REDIS_PREFIX: str = 'product:imported:'
 
 
-class ConfigDefinition(NamedTuple):
+@dataclass(frozen=True)
+class ConfigDefinition:
     """Definition of config parameters.
 
     Should have entries like this:
@@ -15,10 +16,10 @@ class ConfigDefinition(NamedTuple):
     OTHER_VAR: type = 'default_value'
     """
 
-    SYSTEMBOLAGET_API_KEY: str  # Needs to be defined in .env of ENV
-    KAFKA_HOST: str = 'localhost:9092'
-    KAFKA_GROUP_ID: str = 'test'
-    REDIS_HOST: str = 'localhost'
+    systembolaget_api_key: str  # Needs to be defined in ENV
+    kafka_host: str = 'localhost:9092'
+    kafka_group_id: str = 'test'
+    redis_host: str = 'localhost'
 
 
 CONFIG = ConfigDefinition(*config.load(ConfigDefinition))

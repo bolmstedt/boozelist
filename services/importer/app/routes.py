@@ -1,6 +1,6 @@
 """Provides service HTTP routes."""
 import threading
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Dict, List
 
 from confluent_kafka.admin import AdminClient
@@ -38,7 +38,7 @@ class DebugRoute(Route):
         """Return debug information."""
         keys = self.redis_client.keys(self.redis_prefix + '*')
         cached_products = format(len(keys))
-        configs = self.config._asdict()
+        configs = asdict(self.config)
         threads = [thread.name for thread in threading.enumerate()]
 
         return {

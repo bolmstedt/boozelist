@@ -17,18 +17,18 @@ from thread_runner import ThreadRunner
 
 
 def _main() -> None:
-    redis_client = Redis(host=CONFIG.REDIS_HOST)
+    redis_client = Redis(host=CONFIG.redis_host)
     producer = Producer({
-        'bootstrap.servers': CONFIG.KAFKA_HOST,
+        'bootstrap.servers': CONFIG.kafka_host,
         'error_cb': _error_cb
     })
     consumer = Consumer({
-        'bootstrap.servers': CONFIG.KAFKA_HOST,
-        'group.id': CONFIG.KAFKA_GROUP_ID,
+        'bootstrap.servers': CONFIG.kafka_host,
+        'group.id': CONFIG.kafka_group_id,
         'auto.offset.reset': 'earliest'
     })
     consumer.subscribe([KAFKA_TOPIC])
-    admin_client = AdminClient({'bootstrap.servers': CONFIG.KAFKA_HOST})
+    admin_client = AdminClient({'bootstrap.servers': CONFIG.kafka_host})
 
     routes = {
         r'^debug$': DebugRoute(
@@ -42,7 +42,7 @@ def _main() -> None:
         Importer(
             producer,
             redis_client,
-            Systembolaget(CONFIG.SYSTEMBOLAGET_API_KEY)
+            Systembolaget(CONFIG.systembolaget_api_key)
         ),
         Register(consumer, redis_client),
         SimpleServer(8000, routes),

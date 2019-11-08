@@ -1,13 +1,16 @@
 """Loads configuration from ENV, using defaults from a NamedTuple."""
+import dataclasses
 import typing
 import os
 
 
-def load(definition: typing.Type[typing.NamedTuple]) -> list:
-    """Use with a NamedTuple and expand list with *."""
-    return [_cast(os.getenv(k.upper(), definition._field_defaults.get(k)),
-                  definition._field_types.get(k))
-            for k in definition._fields]
+def load(definition: typing.Type[object]) -> typing.List[typing.Any]:
+    if not dataclasses.is_dataclass(definition):
+        raise TypeError('{} is not a dataclass'.
+                        format(type(definition).__name__))
+
+    return [_cast(os.getenv(field.name.upper(), field.default), field.type)
+            for field in dataclasses.fields(definition)]
 
 
 def _cast(value, to_type):

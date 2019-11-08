@@ -86,4 +86,4 @@ class Importer(Runnable):
 
         while runner.run:
             schedule.run_pending()
-            time.sleep(1)
+            time.sleep(60)
