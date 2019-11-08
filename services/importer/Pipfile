@@ -4,19 +4,19 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pylama = "*"
-mypy = "*"
-pylint = "*"
 isort = "*"
+mypy = "*"
+pylama = "*"
+pylint = "*"
 
 [packages]
 confluent-kafka = "*"
 redis = "*"
+requests = "*"
 schedule = "*"
 config-loader = {editable = true,path = "./../../packages/config-loader"}
-requests = "*"
-thread-runner = {editable = true,path = "./../../packages/thread-runner"}
 simple-server = {editable = true,path = "./../../packages/simple-server"}
+thread-runner = {editable = true,path = "./../../packages/thread-runner"}
 
 [requires]
 python_version = "3.7"
