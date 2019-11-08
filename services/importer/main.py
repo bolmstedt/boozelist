@@ -1,4 +1,5 @@
 """Imports products from api.systembolaget.se (and registers them)."""
+import signal
 import sys
 from datetime import datetime
 
@@ -30,11 +31,13 @@ def _main() -> None:
     consumer.subscribe([KAFKA_TOPIC])
     admin_client = AdminClient({'bootstrap.servers': CONFIG.KAFKA_HOST})
 
-    routes = {r'^debug$': DebugRoute(
-        redis_client, admin_client, DebugConfig(
-            REDIS_PREFIX, [KAFKA_TOPIC], CONFIG
+    routes = {
+        r'^debug$': DebugRoute(
+            redis_client, admin_client, DebugConfig(
+                REDIS_PREFIX, [KAFKA_TOPIC], CONFIG
+            )
         )
-    )}
+    }
 
     services = [
         Importer(

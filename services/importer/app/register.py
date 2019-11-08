@@ -1,5 +1,6 @@
 """Provides the Register class."""
 import json
+import time
 from datetime import datetime
 
 from confluent_kafka.cimpl import Consumer
@@ -21,27 +22,31 @@ class Register(Runnable):
         self.consumer = consumer
         self.redis = redis_cli
 
-    def run(self) -> None:
+    def _register(self, raw: bytes) -> None:
+        digest = hash_product(raw)
+        date = str(datetime.now())
+
+        self.redis.set(REDIS_PREFIX + digest, date)
+
+        product = json.loads(raw.decode('utf-8'))
+
+        print('[{}] {} added with hash {}'.
+              format(date, product.get('ProductNameBold'), digest))
+
+    def run(self, runner) -> None:
         """Register produced products to Redis."""
-        while True:
+
+        while runner.run:
             msg = self.consumer.poll(1.0)
 
             if msg is None:
                 continue
             if msg.error():
-                print("Consumer error: {}".format(msg.error()))
+                print('Consumer error: {}'.format(msg.error()))
                 continue
 
-            raw = msg.value()
-            digest = hash_product(raw)
-            date = str(datetime.now())
+            self._register(msg.value())
 
-            self.redis.set(REDIS_PREFIX + digest, date)
-
-            product = json.loads(raw.decode('utf-8'))
-
-            print('[{}] {} added with hash {}'.
-                  format(date, product.get('ProductNameBold'), digest))
-
-    def __del__(self) -> None:
         self.consumer.close()
+        print('[{}] Received SIGTERM, shutting down consumer.'.
+              format(str(datetime.now())))

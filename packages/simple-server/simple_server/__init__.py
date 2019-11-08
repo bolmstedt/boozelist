@@ -52,6 +52,8 @@ class _RoutingServer(http.server.ThreadingHTTPServer):
 class SimpleServer(thread_runner.Runnable):
     """Runnable class of a HTTP server with the specified routes."""
 
+    DAEMON = True
+
     def __init__(
             self,
             port: int,
@@ -60,11 +62,13 @@ class SimpleServer(thread_runner.Runnable):
         self.port = port
         self.router = _Router(routes)
 
-    def run(self) -> None:
+    def run(self, runner) -> None:
         """Star the HTTP server."""
         server = _RoutingServer(
             ('', self.port),
             _SimpleRequestHandler,
             self.router
         )
+
+        print('HTTP server running on port {}.'.format(self.port))
         server.serve_forever()

@@ -72,7 +72,7 @@ class Importer(Runnable):
         print('[{}] Imported {} new products out of {}'.
               format(str(datetime.now()), imported, len(data)))
 
-    def run(self) -> None:
+    def run(self, runner) -> None:
         """Import new products to Kafka.
 
         Imports any new products from Systembolaget not already
@@ -84,6 +84,6 @@ class Importer(Runnable):
         # Schedule to run again every hour
         schedule.every().hour.do(self._import)
 
-        while True:
+        while runner.run:
             schedule.run_pending()
             time.sleep(1)
