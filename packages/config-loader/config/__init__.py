@@ -1,4 +1,4 @@
-"""Loads configuration from ENV, using defaults from a datacalass."""
+"""Loads configuration from ENV, using defaults from a dataclass."""
 import dataclasses
 import typing
 import os

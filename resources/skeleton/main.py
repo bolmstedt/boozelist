@@ -12,7 +12,7 @@ def _main() -> None:
         sentry_sdk.init(CONFIG.sentry_dsn)
 
     services: List[Runnable] = [
-        # Your runnable services here
+        # Your runnable instances here
     ]
 
     ThreadRunner(services).run()
