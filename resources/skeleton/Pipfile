@@ -10,6 +10,7 @@ pylint = "*"
 isort = "*"
 
 [packages]
+sentry-sdk = "==0.13.2"
 config-loader = {editable = true,path = "./../../packages/config-loader"}
 thread-runner = {editable = true,path = "./../../packages/thread-runner"}
 

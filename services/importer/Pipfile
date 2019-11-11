@@ -14,6 +14,7 @@ confluent-kafka = "*"
 redis = "*"
 requests = "*"
 schedule = "*"
+sentry-sdk = "==0.13.2"
 config-loader = {editable = true,path = "./../../packages/config-loader"}
 simple-server = {editable = true,path = "./../../packages/simple-server"}
 thread-runner = {editable = true,path = "./../../packages/thread-runner"}

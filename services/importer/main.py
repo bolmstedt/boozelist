@@ -3,11 +3,13 @@ import sys
 from datetime import datetime
 
 # pylint: disable=no-name-in-module
+import sentry_sdk
 from confluent_kafka.admin import AdminClient
 from confluent_kafka.cimpl import Consumer, KafkaError, Producer
 from redis import Redis
 
-from app.configuration import CONFIG, KAFKA_TOPIC, REDIS_PREFIX
+from app.configuration import (CONFIG, KAFKA_TOPIC, REDIS_PREFIX,
+                               SENTRY_DISABLED)
 from app.importer import Importer
 from app.register import Register
 from app.routes import DebugConfig, DebugRoute
@@ -17,6 +19,9 @@ from thread_runner import ThreadRunner
 
 
 def _main() -> None:
+    if CONFIG.sentry_dsn != SENTRY_DISABLED:
+        sentry_sdk.init(CONFIG.sentry_dsn)
+
     redis_client = Redis(host=CONFIG.redis_host)
     producer = Producer({
         'bootstrap.servers': CONFIG.kafka_host,
